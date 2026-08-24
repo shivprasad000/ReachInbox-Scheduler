@@ -1,19 +1,17 @@
 import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 
 export default function AuthCallback() {
-  const navigate = useNavigate();
-
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const token = params.get("token");
     if (token) {
       localStorage.setItem("token", token);
-      navigate("/dashboard", { replace: true });
+      // Full reload so App.tsx re-runs /auth/me with token already in localStorage
+      window.location.href = "/dashboard";
     } else {
-      navigate("/login", { replace: true });
+      window.location.href = "/login";
     }
-  }, [navigate]);
+  }, []);
 
   return (
     <div className="min-h-screen flex items-center justify-center text-slate-400 text-sm">
