@@ -4,9 +4,10 @@ import { api } from "./api/client";
 import { Me } from "./types";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
+import AuthCallback from "./pages/AuthCallback";
 
 export default function App() {
-  const [user, setUser] = useState<Me | null | undefined>(undefined); // undefined = loading
+  const [user, setUser] = useState<Me | null | undefined>(undefined);
 
   useEffect(() => {
     api
@@ -22,6 +23,7 @@ export default function App() {
   return (
     <Routes>
       <Route path="/login" element={user ? <Navigate to="/dashboard" /> : <Login />} />
+      <Route path="/auth-callback" element={<AuthCallback />} />
       <Route
         path="/dashboard"
         element={user ? <Dashboard user={user} /> : <Navigate to="/login" />}

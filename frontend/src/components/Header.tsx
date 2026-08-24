@@ -6,6 +6,7 @@ export default function Header({ user }: { user: Me }) {
   const navigate = useNavigate();
 
   async function handleLogout() {
+    localStorage.removeItem("token");
     await api.post("/auth/logout");
     navigate("/login");
   }

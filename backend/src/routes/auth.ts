@@ -53,13 +53,8 @@ authRouter.get(
     const user = req.user as { id: string };
     const token = jwt.sign({ sub: user.id }, config.jwtSecret, { expiresIn: "7d" });
 
-    res.cookie("token", token, {
-      httpOnly: true,
-      sameSite: "lax",
-      secure: process.env.NODE_ENV === "production",
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-    });
-    res.redirect(`${config.frontendUrl}/dashboard`);
+    // Cross-domain: pass token in URL so frontend saves to localStorage
+    res.redirect(`${config.frontendUrl}/auth-callback?token=${token}`);
   }
 );
 

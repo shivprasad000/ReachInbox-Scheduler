@@ -4,7 +4,16 @@ export const API_URL = import.meta.env.VITE_API_URL || "http://localhost:4000";
 
 export const api = axios.create({
   baseURL: API_URL,
-  withCredentials: true, // send the httpOnly auth cookie
+  withCredentials: true,
+});
+
+// Attach token from localStorage on every request (cross-domain production)
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem("token");
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
 });
 
 export function googleLoginUrl() {
