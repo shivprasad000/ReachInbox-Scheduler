@@ -1,0 +1,63 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum EmailStatus {
+  scheduled
+  queued
+  sent
+  failed
+  rescheduled
+}
+
+model User {
+  id        String   @id @default(uuid())
+  googleId  String   @unique
+  email     String   @unique
+  name      String
+  avatarUrl String?
+  createdAt DateTime @default(now())
+
+  batches EmailBatch[]
+}
+
+// One "Compose" submission (a CSV of leads + subject/body + config) becomes a batch
+model EmailBatch {
+  id                  String   @id @default(uuid())
+  userId              String
+  user                User     @relation(fields: [userId], references: [id])
+  subject             String
+  body                String   @db.Text
+  startTime           DateTime
+  delayMs             Int
+  hourlyLimit         Int
+  createdAt           DateTime @default(now())
+
+  jobs EmailJob[]
+}
+
+model EmailJob {
+  id            String      @id @default(uuid())
+  batchId       String
+  batch         EmailBatch  @relation(fields: [batchId], references: [id])
+  recipient     String
+  subject       String
+  body          String      @db.Text
+  sender        String
+  scheduledAt   DateTime
+  sentAt        DateTime?
+  status        EmailStatus @default(scheduled)
+  attempts      Int         @default(0)
+  lastError     String?
+  bullJobId     String?     @unique
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  @@index([status])
+  @@index([sender, scheduledAt])
+}
